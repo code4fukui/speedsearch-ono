@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<link rel="stylesheet" href="style.css">
+<title>福井県大野市ホームページ高速検索</title></head><body>
+<h1>福井県大野市ホームページ高速検索</h1>
+<input type=text id=insearch>
+<div class=result id=divresult>
+<!--
+  <ul>
+    <li><a href=https://www.city.ono.fukui.jp/kurashi/chiikidukuri/kouminkan/inuikawa-k/plan/kouza/mynumber_shinsei.html>スマホでマイナンバーカード申請講座(乾側公民館)</a></li>
+    <li><a href=https://www.city.ono.fukui.jp/kurashi/chiikidukuri/kouminkan/kamisho-k/kouza/mainannba-ka-do.html>スマホでマイナンバーカード申請講座(乾側公民館)</a></li>
+  </ul>
+-->
+</div>
+<hr>
+DATA: <a href=https://www.city.ono.fukui.jp/shisei/johokoukai/opendata1.html>大野市オープンデータ　大野市公式ウェブサイト</a><br>
+<a href=https://github.com/code4fukui/opendata-ono/>src on GitHub</a><br>
+
+<script type="module">
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { search } from "https://js.sabae.cc/search.js";
+import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
+
+const url = "https://www.city.ono.fukui.jp/shisei/johokoukai/opendata1.files/02-02_20240401.csv";
+const data = await CSV.fetchJSON(url);
+console.log(data)
+
+const format = (data) => {
+  /*
+  if (data["ディレクトリ階層情報"]) {
+    return { title: data["ディレクトリ名"], url: data["ディレクトリ階層情報"] };
+  }
+  if (data["マルチリンク設定内容（url)"]) {
+    return { title: data["マルチリンク設定内容（localePath)"], url: data["マルチリンク設定内容（url)"] };
+  }
+  return { title: data["タイトル"], url: data[""] };
+  */
+  const url = data["ディレクトリ階層情報"] || data["マルチリンク設定内容（url)"] || data[""];
+  for (let i = 1; i <= 9; i++) {
+    const title = data["サイトマップ" + i];
+    if (title) {
+      if (data["コンテンツ概要"]) {
+        return { title: title + " - " + data["コンテンツ概要"], url };
+      }
+      return { title, url };
+    }
+  }
+  throw new Error("illegal item!");
+};
+
+const makeUL = (items) => {
+  const ul = document.createElement("ul");
+  for (const item of items) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = item.url;
+    a.textContent = item.title;
+    li.appendChild(a);
+    ul.appendChild(li);
+  }
+  return ul;
+};
+
+insearch.onkeyup = insearch.onchange = (e) => {
+  const key = insearch.value.trim();
+  //console.log(key, e)
+  if (insearch.bkvalue == key) return;
+  insearch.bkvalue = key;
+  const hits = search(data, key);
+  const items = ArrayUtil.toUniqueByString(hits.map(i => format(i)));
+  divresult.innerHTML = "";
+  divresult.appendChild(makeUL(items));
+  //divresult.appendChild(CSV.makeTable(CSV.fromJSON(items)));
+  /*
+  const tbl = document.createElement("table");
+  for (const item of hits) {}
+  */
+};
+/*
+const url2 = "https://www.city.ono.fukui.jp/shisei/jinken/news/index.html";
+const html = await (await fetch(url2)).text();
+console.log(html)
+*/
+
+
+</script>
+
+</body></html>
+

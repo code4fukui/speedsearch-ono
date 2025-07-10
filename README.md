@@ -1,6 +1,6 @@
 # speedsearch-ono
 
-[福井県大野市高速検索](https://code4fukui.github.io/speedsearch-ono/)
+[福井県大野市ホームページ高速検索](https://code4fukui.github.io/speedsearch-ono/)
 
 ## reference
 
